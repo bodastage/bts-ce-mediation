@@ -14,6 +14,8 @@ RUN apt-get install --no-install-recommends --no-upgrade  -y openjdk-8-jre-headl
 
 RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
 
+RUN pip install odo
+
 USER airflow
 
 EXPOSE 8080 5555 8793
