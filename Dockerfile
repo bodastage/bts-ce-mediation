@@ -142,6 +142,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		unzip \
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
+# otgresclient	
+RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
 	
 # JRE8
 # ########################################################################
@@ -223,9 +225,6 @@ RUN set -ex \
         $buildDeps \
         python3-pip \
         python3-requests \
-        mysql-client \
-        mysql-server \
-        libmysqlclient-dev \
         apt-utils \
         curl \
         rsync \
@@ -241,7 +240,7 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql]==$AIRFLOW_VERSION \
+    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc]==$AIRFLOW_VERSION \
     && pip install celery[redis]==4.0.2 \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
