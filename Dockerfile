@@ -10,11 +10,10 @@ RUN mkdir -p /usr/share/man/man1
 
 RUN mkdir -p /mediation  && chmod -R 777 /mediation
 
-RUN apt-get install --no-install-recommends --no-upgrade  -y openjdk-8-jre-headless
-
-RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
-
-RUN apt-get install zip unzip
+RUN apt-get remove binutils \
+    && apt-get install --no-install-recommends --no-upgrade  -y openjdk-8-jre-headless \
+	&& apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10 \
+	&& apt-get install zip unzip
 
 RUN pip install odo
 
