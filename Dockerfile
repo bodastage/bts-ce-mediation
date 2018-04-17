@@ -143,8 +143,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		xz-utils \
 		wget \
 		gnupg \
-		gnugp1 \
-		gnugp2 \
 	&& rm -rf /var/lib/apt/lists/*
 	
 # Potgresclient	
