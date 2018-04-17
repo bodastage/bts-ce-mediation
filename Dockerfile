@@ -134,13 +134,17 @@ RUN set -ex; \
 
 # CMD ["python3"]
 
-# ZIP
+# ZIP and other useful utilities
 # ########################################################################
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		bzip2 \
 		zip \
 		unzip \
 		xz-utils \
+		wget \
+		gnupg \
+		gnugp1 \
+		gnugp2 \
 	&& rm -rf /var/lib/apt/lists/*
 	
 # Potgresclient	
