@@ -2,9 +2,13 @@ FROM puckel/docker-airflow:1.9.0
 
 USER root
 
-RUN add-apt-repository ppa:openjdk-r/ppa
-RUN apt-get update
-RUN apt-get install openjdk-8-jre
+RUN echo "deb http://ftp.debian.org/debian testing main" | tee --append /etc/apt/sources.list.d/testing.list
+
+RUN  apt-get update 
+
+RUN mkdir -p /usr/share/man/man1
+
+RUN apt-get install --no-install-recommends --no-upgrade  -y openjdk-8-jre-headless
 
 RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
 
