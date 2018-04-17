@@ -144,7 +144,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 	
 # Potgresclient	
-RUN echo "deb http://ftp.debian.org/debian testing main" | tee --append /etc/apt/sources.list.d/testing.list
+
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main 10" > /etc/apt/sources.list.d/pgdg.list; \
+
 RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
 	
 # JRE8
