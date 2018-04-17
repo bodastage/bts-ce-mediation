@@ -145,8 +145,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	
 # Potgresclient	
 
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main 10" > /etc/apt/sources.list.d/pgdg.list
-	&& apt-get update
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main 10" > /etc/apt/sources.list.d/pgdg.list \
+	&& apt-get update \
 	&& apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10; 
 	
 # JRE8
