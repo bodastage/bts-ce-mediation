@@ -6,6 +6,10 @@
 #
 # Installs: Python3, jre8 from OpenJDK, zip, unzip, git, airflow
 # 
+# Compiled from:
+# https://github.com/docker-library/python/3.6/stretch/slim/Dockerfile
+# https://github.com/docker-library/openjdk/8-jdk/slim/Dockerfile
+# https://github.com/puckel/docker-airflow/Dockerfile
 
 FROM debian:stretch-slim
 
@@ -186,3 +190,77 @@ RUN set -ex; \
 
 # see CA_CERTIFICATES_JAVA_VERSION notes above
 RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
+
+# Airflow
+# ###########################################
+
+ARG AIRFLOW_VERSION=1.9.0
+ARG AIRFLOW_HOME=/usr/local/airflow
+
+# Define en_US.
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_MESSAGES en_US.UTF-8
+
+RUN set -ex \
+    && buildDeps=' \
+        python3-dev \
+        libkrb5-dev \
+        libsasl2-dev \
+        libssl-dev \
+        libffi-dev \
+        build-essential \
+        libblas-dev \
+        liblapack-dev \
+        libpq-dev \
+        git \
+    ' \
+    && apt-get update -yqq \
+    && apt-get upgrade -yqq \
+    && apt-get install -yqq --no-install-recommends \
+        $buildDeps \
+        python3-pip \
+        python3-requests \
+        mysql-client \
+        mysql-server \
+        libmysqlclient-dev \
+        apt-utils \
+        curl \
+        rsync \
+        netcat \
+        locales \
+    && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    && locale-gen \
+    && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
+    && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
+    && pip install -U pip setuptools wheel \
+    && pip install Cython \
+    && pip install pytz \
+    && pip install pyOpenSSL \
+    && pip install ndg-httpsclient \
+    && pip install pyasn1 \
+    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql]==$AIRFLOW_VERSION \
+    && pip install celery[redis]==4.0.2 \
+    && apt-get purge --auto-remove -yqq $buildDeps \
+    && apt-get autoremove -yqq --purge \
+    && apt-get clean \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /tmp/* \
+        /var/tmp/* \
+        /usr/share/man \
+        /usr/share/doc \
+        /usr/share/doc-base
+
+COPY script/entrypoint.sh /entrypoint.sh
+COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+
+RUN chown -R airflow: ${AIRFLOW_HOME}
+
+EXPOSE 8080 5555 8793
+
+USER airflow
+WORKDIR ${AIRFLOW_HOME}
+ENTRYPOINT ["/entrypoint.sh"]
