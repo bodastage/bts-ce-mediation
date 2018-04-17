@@ -142,7 +142,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		unzip \
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
-# otgresclient	
+	
+# Potgresclient	
+RUN echo "deb http://ftp.debian.org/debian testing main" | tee --append /etc/apt/sources.list.d/testing.list
 RUN apt-get install --no-install-recommends --no-upgrade  -y postgresql-client-10
 	
 # JRE8
