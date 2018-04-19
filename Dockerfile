@@ -1,15 +1,16 @@
 # VERSION 1.0.1
-# AUTHOR: Matthieu Bodastage Solutions
+# AUTHOR: Bodastage Solutions
 # DESCRIPTION: BTS-CE Mediation Server
 # BUILD: docker build --rm -t bodastage/bts-ce-mediation .
 # SOURCE: https://github.com/bodastage/boda-ce-mediation
 #
-# Installs: Python3, jre8 from OpenJDK, zip, unzip, git, airflow
+# Installs: Python3, jre8 from OpenJDK, zip, unzip, git, airflow,procps, 7zip and urar
 # 
 # Compiled from:
 # https://github.com/docker-library/python/3.6/stretch/slim/Dockerfile
 # https://github.com/docker-library/openjdk/8-jdk/slim/Dockerfile
 # https://github.com/puckel/docker-airflow/Dockerfile
+#
 
 FROM debian:stretch-slim
 
