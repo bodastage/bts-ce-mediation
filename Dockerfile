@@ -145,6 +145,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		gnupg \
 		file \
 		ps \
+		p7zip-full \
+		unrar-free \
 	&& rm -rf /var/lib/apt/lists/*
 	
 # Potgresclient	
