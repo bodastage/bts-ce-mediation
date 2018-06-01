@@ -285,8 +285,8 @@ COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
 # 
-COPY ./wait-for-postgres.sh /wait-for-postgres.sh
-RUN chmod 777 /wait-for-postgres.sh
+COPY script/wait-for-it.sh /wait-for-it.sh
+RUN chmod 777 /wait-for-it.sh
 
 EXPOSE 8080 5555 8793
 
