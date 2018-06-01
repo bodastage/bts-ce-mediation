@@ -14,7 +14,7 @@
 
 FROM debian:stretch-slim
 
-MAINTAINER erssebaggala
+LABEL maintainer Bodastage Engineering<engineering@bodastage.com>
 
 # Python3
 # ########################################################################
@@ -278,11 +278,14 @@ RUN set -ex \
         /usr/share/doc-base
 
 COPY script/entrypoint.sh /entrypoint.sh
-COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
-
 RUN chmod 777 /entrypoint.sh
 
+COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN chown -R airflow: ${AIRFLOW_HOME}
+
+# 
+COPY ./wait-for-postgres.sh /wait-for-postgres.sh
+RUN chmod 777 /wait-for-postgres.sh
 
 EXPOSE 8080 5555 8793
 
