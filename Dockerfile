@@ -284,6 +284,10 @@ RUN chmod 777 /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
+
+# Create migration folder
+RUN mkdir -p /migrations
+
 # 
 COPY script/wait-for-it.sh /wait-for-it.sh
 RUN chmod 777 /wait-for-it.sh
