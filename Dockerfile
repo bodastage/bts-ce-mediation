@@ -69,7 +69,13 @@ RUN set -ex \
 	&& wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
 	&& wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" \
+	&& for server in ha.pool.sks-keyservers.net \
+		  hkp://p80.pool.sks-keyservers.net:80 \
+		  keyserver.ubuntu.com \
+		  hkp://keyserver.ubuntu.com:80 \
+		  pgp.mit.edu; do \
+        gpg --keyserver "$server" --recv-keys "$GPG_KEY" && break || echo "Trying new server..."; \
+	done \
 	&& gpg --batch --verify python.tar.xz.asc python.tar.xz \
 	&& rm -rf "$GNUPGHOME" python.tar.xz.asc \
 	&& mkdir -p /usr/src/python \
@@ -283,14 +289,6 @@ RUN chmod 777 /entrypoint.sh
 
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN chown -R airflow: ${AIRFLOW_HOME}
-
-
-# Create migration folder
-RUN mkdir -p /migrations
-
-# 
-COPY script/wait-for-it.sh /wait-for-it.sh
-RUN chmod 777 /wait-for-it.sh
 
 EXPOSE 8080 5555 8793
 
