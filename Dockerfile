@@ -198,6 +198,10 @@ ENV JAVA_DEBIAN_VERSION 8u171-b11-1~deb9u1
 # and https://github.com/docker-library/java/issues/19#issuecomment-70546872
 ENV CA_CERTIFICATES_JAVA_VERSION 20170531+nmu1
 
+# Update ca-certificates in backports 
+# This is meant to solve the dependency unmet error that stops the build
+RUN apt-get install -t jessie-backports ca-certificates-java
+
 RUN set -ex; \
 	\
 # deal with slim variants not having man page directories (which causes "update-alternatives" to fail)
