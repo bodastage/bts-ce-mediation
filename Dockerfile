@@ -7,7 +7,7 @@
 # Installs: Python3, jre8 from OpenJDK, zip, unzip, git, airflow,procps, 7zip and urar
 # 
 # Compiled from:
-# https://github.com/docker-library/python/3.6/stretch/slim/Dockerfile
+# https://github.com/docker-library/python/3.7/stretch/slim/Dockerfile
 # https://github.com/docker-library/openjdk/8-jdk/slim/Dockerfile
 # https://github.com/puckel/docker-airflow/Dockerfile
 #
@@ -26,23 +26,30 @@ ENV PATH /usr/local/bin:$PATH
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
 
+RUN set -ex; \
+	if ! command -v gpg > /dev/null; then \
+		apt-get update; \
+		apt-get install -y --no-install-recommends \
+			gnupg \
+			dirmngr \
+		; \
+		rm -rf /var/lib/apt/lists/*; \
+	fi
+
+
 # runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		ca-certificates \
-		libexpat1 \
-		libffi6 \
-		libgdbm3 \
-		libreadline7 \
-		libsqlite3-0 \
-		libssl1.1 \
-		netcat \
+		netbase \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV GPG_KEY 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
-ENV PYTHON_VERSION 3.6.5
+ENV PYTHON_VERSION 3.7.0
 
 RUN set -ex \
-	&& buildDeps=" \
+	\
+	&& savedAptMark="$(apt-mark showmanual)" \
+	&& apt-get update && apt-get install -y --no-install-recommends \
 		dpkg-dev \
 		gcc \
 		libbz2-dev \
@@ -56,27 +63,26 @@ RUN set -ex \
 		libsqlite3-dev \
 		libssl-dev \
 		make \
-		tcl-dev \
 		tk-dev \
+		uuid-dev \
 		wget \
 		xz-utils \
 		zlib1g-dev \
 # as of Stretch, "gpg" is no longer included by default
 		$(command -v gpg > /dev/null || echo 'gnupg dirmngr') \
-	" \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 	\
 	&& wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
 	&& wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& for server in ha.pool.sks-keyservers.net \
-		  hkp://p80.pool.sks-keyservers.net:80 \
-		  keyserver.ubuntu.com \
-		  hkp://keyserver.ubuntu.com:80 \
-		  pgp.mit.edu; do \
-        gpg --keyserver "$server" --recv-keys "$GPG_KEY" && break || echo "Trying new server..."; \
+              hkp://p80.pool.sks-keyservers.net:80 \
+              keyserver.ubuntu.com \
+              hkp://keyserver.ubuntu.com:80 \
+              pgp.mit.edu; do \
+    gpg --keyserver "$server" --recv-keys "$GPG_KEY" && break || echo "Trying new server..."; \
 	done \
 	&& gpg --batch --verify python.tar.xz.asc python.tar.xz \
+	&& { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
 	&& rm -rf "$GNUPGHOME" python.tar.xz.asc \
 	&& mkdir -p /usr/src/python \
 	&& tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
@@ -95,7 +101,17 @@ RUN set -ex \
 	&& make install \
 	&& ldconfig \
 	\
-	&& apt-get purge -y --auto-remove $buildDeps \
+	&& apt-mark auto '.*' > /dev/null \
+	&& apt-mark manual $savedAptMark \
+	&& find /usr/local -type f -executable -not \( -name '*tkinter*' \) -exec ldd '{}' ';' \
+		| awk '/=>/ { print $(NF-1) }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -r apt-mark manual \
+	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+	&& rm -rf /var/lib/apt/lists/* \
 	\
 	&& find /usr/local -depth \
 		\( \
@@ -103,7 +119,9 @@ RUN set -ex \
 			-o \
 			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' + \
-	&& rm -rf /usr/src/python
+	&& rm -rf /usr/src/python \
+	\
+	&& python3 --version
 
 # make some useful symlinks that are expected to exist
 RUN cd /usr/local/bin \
@@ -113,17 +131,20 @@ RUN cd /usr/local/bin \
 	&& ln -s python3-config python-config
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 9.0.3
+ENV PYTHON_PIP_VERSION 18.1
 
 RUN set -ex; \
 	\
+	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends wget; \
-	rm -rf /var/lib/apt/lists/*; \
 	\
 	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
 	\
-	apt-get purge -y --auto-remove wget; \
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
 	python get-pip.py \
 		--disable-pip-version-check \
@@ -139,8 +160,6 @@ RUN set -ex; \
 			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py
-
-# CMD ["python3"]
 
 # zip, unzip, wget,gnupg, file and other useful utilities
 # ########################################################################
@@ -158,7 +177,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 	
 # Potgresclient	
-
+# #########################################################################
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main 10" > /etc/apt/sources.list.d/pgdg.list \
 	&& wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
 	&& apt-get update \
@@ -199,7 +218,7 @@ ENV JAVA_DEBIAN_VERSION 8u171-b11-1~deb9u1
 ENV CA_CERTIFICATES_JAVA_VERSION 20170531+nmu1
 
 # Update ca-certificates in backports 
-# This is meant to solve the dependency unmet error that stops the build
+# This is meant to solve the dependency unmet error that stops the 
 RUN apt-get install -t jessie-backports ca-certificates-java
 
 RUN set -ex; \

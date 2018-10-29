@@ -1,8 +1,6 @@
-[![license](https://img.shields.io/github/license/bodastage/bts-ce-mediation.svg)](https://github.com/bodastage/bts-ce-mediation/blob/master/LICENSE)
+## Boda Telecom Suite Enterprise Edition Mediation Server
 
-## Boda Telecom Suite Community Edition Mediation Server
-
-Mediation server for Boda Telecom Suite Community Edition(BTS-CE).  BTS-CE is an open source telecommunication network management platform.
+Mediation server for Boda Telecom Suite Enterprise Edition(BTS-CE).  BTS-EE is a telecommunication network management platform.
 
 ## Built With
 
@@ -14,8 +12,7 @@ Mediation server for Boda Telecom Suite Community Edition(BTS-CE).  BTS-CE is an
 
 ## Resources
 
-* [Communtiy Forum at TelecomHall.net](http://telecomHall.net)
-* [Online Documentation](http://bts.bodastage.org)
+* [Online Documentation](http://docs.bodastage.com)
 
 ## Copyright / License
 Copyright 2017 - 2018 [Bodastage Solutions](http://www.bodastage.com)
@@ -23,3 +20,7 @@ Copyright 2017 - 2018 [Bodastage Solutions](http://www.bodastage.com)
 Licensed under the Apache License, Version 2.0 ; you may not use this work except in compliance with the License. You may obtain a copy of the License in the LICENSE file, or at:
 
 https://www.apache.org/licenses/LICENSE-2.0
+
+"Commons Clause" License Condition v1.0
+
+https://commonsclause.com/
