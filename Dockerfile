@@ -245,8 +245,11 @@ RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
 # Airflow
 # ###########################################
 
-ARG AIRFLOW_VERSION=1.9.0
+ARG AIRFLOW_VERSION=1.10.0
 ARG AIRFLOW_HOME=/usr/local/airflow
+ARG AIRFLOW_DEPS=""
+ARG PYTHON_DEPS=""
+ENV AIRFLOW_GPL_UNIDECODE yes
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -257,12 +260,12 @@ ENV LC_MESSAGES en_US.UTF-8
 
 RUN set -ex \
     && buildDeps=' \
+        freetds-dev \
         python3-dev \
         libkrb5-dev \
         libsasl2-dev \
         libssl-dev \
         libffi-dev \
-        build-essential \
         libblas-dev \
         liblapack-dev \
         libpq-dev \
@@ -272,6 +275,8 @@ RUN set -ex \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
+        freetds-bin \
+        build-essential \
         python3-pip \
         python3-requests \
         apt-utils \
