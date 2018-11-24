@@ -79,9 +79,9 @@ RUN set -ex \
               keyserver.ubuntu.com \
               hkp://keyserver.ubuntu.com:80 \
               pgp.mit.edu; do \
-    gpg --keyserver "$server" --recv-keys "$GPG_KEY" && break || echo "Trying new server..."; \
+    gpg --no-tty --keyserver "$server" --recv-keys "$GPG_KEY" && break || echo "Trying new server..."; \
 	done \
-	&& gpg --batch --verify python.tar.xz.asc python.tar.xz \
+	&& gpg --no-tty --batch --verify python.tar.xz.asc python.tar.xz \
 	&& { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
 	&& rm -rf "$GNUPGHOME" python.tar.xz.asc \
 	&& mkdir -p /usr/src/python \
