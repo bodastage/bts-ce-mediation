@@ -279,6 +279,7 @@ RUN set -ex \
         build-essential \
         python3-pip \
         python3-requests \
+        default-libmysqlclient-dev \
         apt-utils \
         curl \
         rsync \
@@ -295,8 +296,9 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
 	&& pip install pika \
-    && pip install apache-airflow[crypto,celery,postgres,hive,mysql,jdbc,ssh]==$AIRFLOW_VERSION \
+    && pip install apache-airflow[crypto,celery,postgres,hive,mysql,jdbc,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==$AIRFLOW_VERSION \
     && pip install 'redis>=2.10.5,<3' \
+    && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
@@ -321,3 +323,5 @@ USER airflow
 WORKDIR ${AIRFLOW_HOME}
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["webserver"] # set default arg for entrypoint
