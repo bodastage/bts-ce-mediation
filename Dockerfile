@@ -295,7 +295,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
 	&& pip install pika \
-    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,ssh]==$AIRFLOW_VERSION \
+    && pip install apache-airflow[crypto,celery,postgres,hive,mysql,jdbc,ssh]==$AIRFLOW_VERSION \
     && pip install 'redis>=2.10.5,<3' \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
